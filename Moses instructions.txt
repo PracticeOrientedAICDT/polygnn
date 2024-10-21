@@ -1,0 +1,24 @@
+I have poetry and brew but couldn't install python 3.7 like they suggest so I used conda:
+
+    conda create -n polygnn python=3.7
+
+Once inside the enviroment (conda activate polygnn) I tried to run poetry install but poetry had issues, so I ended up uninstalling and reinstalling it :)
+
+    pip uninstall poetry
+    pip install poetry==1.5.1
+    cd path/to/file
+    poetry install
+
+It took a couple of tries to install packages with poetry. No clue why. If you're stuck try running:
+    pip install poetry-core
+
+
+I changed the windows command to look for torch 1.10.2+cu102        rather than 1.12.1+cu102
+                            and same with torchvision 0.11.3+cu102  rather than 0.13.1+cu102
+                                      and torchaudio 0.10.2         rather than 0.12.1
+
+I ran the next command as per the README instructions and the last one did not work so I ran
+    pip install torch_geometric==2.0.0
+
+
+NONE OF THIS WORKED :(
