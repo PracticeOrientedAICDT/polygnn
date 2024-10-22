@@ -1,24 +1,25 @@
-I have poetry and brew but couldn't install python 3.7 like they suggest so I used conda:
+So I installed python3.8 on Ubuntu with the following commands:
 
-    conda create -n polygnn python=3.7
+    sudo apt install software-properties-common
+    sudo add-apt-repository ppa:deadsnakes/ppa
+    sudo apt update
+    sudo apt install python3.8
 
-Once inside the enviroment (conda activate polygnn) I tried to run poetry install but poetry had issues, so I ended up uninstalling and reinstalling it :)
+(I recommend looking up how to install python3.8 on macos)
 
-    pip uninstall poetry
-    pip install poetry==1.5.1
-    cd path/to/file
-    poetry install
+I followed up by installing poetry, which can be done with pip
 
-It took a couple of tries to install packages with poetry. No clue why. If you're stuck try running:
-    pip install poetry-core
+    pip install poetry
 
+And then I followed the instructions as described on github
 
-I changed the windows command to look for torch 1.10.2+cu102        rather than 1.12.1+cu102
-                            and same with torchvision 0.11.3+cu102  rather than 0.13.1+cu102
-                                      and torchaudio 0.10.2         rather than 0.12.1
+    whereis python3.8                   # to find the path
+    poetry env use /path/to/python3.8
+    poetry install                      # in the root file of the project
+    poetry poetry run poe torch-osx.    # or poetry run poe torch-linux_win-cuda102 for me
 
-I ran the next command as per the README instructions and the last one did not work so I ran
-    pip install torch_geometric==2.0.0
+For the last line I had issues and if it doesn't work I'd recommend 
 
-
-NONE OF THIS WORKED :(
+    poetry run pip install torch_geometric
+    poetry run pip install --no-index torch-scatter -f https://pytorch-geometric.com/whl/torch-1.12.0+cpu.html
+    poetry run pip install --no-index torch-sparse -f https://pytorch-geometric.com/whl/torch-1.12.0+cpu.html
