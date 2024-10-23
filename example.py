@@ -12,7 +12,7 @@ import torch
 from torch import nn
 import polygnn
 import polygnn_trainer as pt
-
+from polygnn.utils import delete_directory
 
 pd.options.mode.chained_assignment = None
 
@@ -127,7 +127,9 @@ smiles_featurizer = lambda x: polygnn.featurize.get_minimum_graph_tensor(
 # Make a directory to save our models in. If you are using this file
 # as a template to train a new model, then feel free to change this
 # name to suit your use case.
-parent_dir = "example_models/"
+parent_dir = "example_models"
+delete_directory(parent_dir)
+parent_dir = parent_dir + "/"
 mkdir(parent_dir)
 
 # Train one model per group. We only have one group, "electronic", in this

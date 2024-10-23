@@ -59,3 +59,17 @@ def lazy_property(fn):
         return getattr(self, attr_name)
 
     return _lazy_property
+
+def delete_directory(my_path):
+    if os.path.isdir(my_path):
+        for i in os.listdir(my_path):
+            item = os.path.join(my_path, i)
+
+            if os.path.isfile(item):
+                os.remove(item)
+            elif os.path.isdir(item):
+                delete_directory(item)
+                
+        if len(os.listdir(my_path)) == 0:
+            os.rmdir(my_path)
+                            
