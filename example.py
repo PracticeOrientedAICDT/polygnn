@@ -23,7 +23,8 @@ parser.add_argument("--polygnn2", default=False, action="store_true")
 parser.add_argument("--device", choices=["cpu", "gpu"], default="cpu")
 args = parser.parse_args()
 if (not args.polygnn) and (not args.polygnn2):
-    raise ValueError("Neither the polygnn nor the polygnn2 flags are set. Choose one.")
+    # raise ValueError("Neither the polygnn nor the polygnn2 flags are set. Choose one.")
+    args.polygnn = True
 elif args.polygnn and args.polygnn2:
     raise ValueError("Both the polygnn and the polygnn2 flags are set. Choose one.")
 
