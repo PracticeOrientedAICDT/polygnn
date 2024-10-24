@@ -1,6 +1,7 @@
 ## Added by me
 local/
 example_models/
+data/
 
 *.pkl
 !trained_models/*/metadata/features.pkl
