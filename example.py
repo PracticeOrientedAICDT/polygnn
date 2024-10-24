@@ -20,7 +20,7 @@ pd.options.mode.chained_assignment = None
 parser = argparse.ArgumentParser()
 parser.add_argument("--polygnn", default=False, action="store_true")
 parser.add_argument("--polygnn2", default=False, action="store_true")
-parser.add_argument("--device", choices=["cpu", "gpu"], default="gpu")
+parser.add_argument("--device", choices=["cpu", "gpu"], default="cpu")
 args = parser.parse_args()
 if (not args.polygnn) and (not args.polygnn2):
     raise ValueError("Neither the polygnn nor the polygnn2 flags are set. Choose one.")
