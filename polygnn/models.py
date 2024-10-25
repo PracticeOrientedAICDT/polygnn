@@ -174,5 +174,7 @@ def ZINC_pretrain(model: polyGNN) -> polyGNN:
 
             global_counter += 1
     
+    return model
+    
 
             
