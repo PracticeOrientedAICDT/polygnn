@@ -1,10 +1,14 @@
 import torch
 import torch.nn.functional as F
+import torch.nn as nn
 import random
 import numpy as np
 import polygnn_trainer as pt
+from torch_geometric.loader import DataLoader
 
 import polygnn.layers as layers
+
+from torch_geometric.datasets import ZINC
 
 random.seed(2)
 torch.manual_seed(2)
@@ -95,3 +99,80 @@ class polyGNN(pt.std_module.StandardModule):
         data.yhat = self.final_mlp(data.yhat)
         data.yhat = self.out_layer(data.yhat)
         return data.yhat.view(data.num_graphs, 1)
+
+
+def ZINC_pretrain(model: polyGNN) -> polyGNN:
+    zinc_dataset = ZINC(root = './data', split='train')
+    zinc_dataset_val = ZINC(root = './data', split='val')   
+
+    batch_size = 256
+    train_loader = DataLoader(zinc_dataset, batch_size=batch_size, shuffle=True)
+    val_loader = DataLoader(zinc_dataset_val, batch_size=batch_size, shuffle=True)
+    
+    loss_fn = nn.MSELoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.0005, weight_decay=5e-4)
+
+    def train(batch, step_optimizer=True):    
+        model.train()
+        optimizer.zero_grad()
+
+        output = model(x=batch.x, 
+                    edge_index=batch.edge_index, 
+                    edge_attr=batch.edge_attr, 
+                    batch_index=batch.batch)
+        
+        loss = loss_fn(output.squeeze(1), batch.y)
+
+        loss.backward()
+        if step_optimizer:
+            optimizer.step()
+
+
+        return loss.item()
+    
+    def validate(batch):
+        model.eval()
+
+        with torch.no_grad():
+            output = model(batch)
+            return loss_fn(output.squeeze(1), batch.y).item()
+        
+    def validation_step():
+        loss_sum = 0
+        for batch in val_loader:
+            loss_sum += validate(batch)
+        return loss_sum / len(val_loader)
+    
+    epochs = 100
+    average_over = 100
+    validate_every = 1000
+    losses = []
+    val_losses = []
+
+    global_counter = 0
+
+
+    for e in range(1, epochs+1):
+        loss_sum = 0
+        loss_count = 0
+
+        for i, batch in enumerate(train_loader):
+
+            train_loss = train(batch=batch, step_optimizer=True)
+
+            loss_sum += train_loss
+            loss_count += 1
+
+            if i % average_over == average_over - 1:
+                losses.append(loss_sum / loss_count)
+                loss_sum = 0
+                loss_count = 0
+
+            if global_counter % validate_every == validate_every - 1:
+
+                val_losses.append(validation_step())
+
+            global_counter += 1
+    
+
+            
