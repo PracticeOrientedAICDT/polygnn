@@ -102,8 +102,8 @@ class polyGNN(pt.std_module.StandardModule):
 
 
 def ZINC_pretrain(model: polyGNN) -> polyGNN:
-    zinc_dataset = ZINC(root = './data', split='train')
-    zinc_dataset_val = ZINC(root = './data', split='val')   
+    zinc_dataset = ZINC(root = 'data/', split='train')
+    zinc_dataset_val = ZINC(root = 'data/', split='val')   
 
     batch_size = 256
     train_loader = DataLoader(zinc_dataset, batch_size=batch_size, shuffle=True)
