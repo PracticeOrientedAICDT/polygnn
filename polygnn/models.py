@@ -31,6 +31,7 @@ class polyGNN(pt.std_module.StandardModule):
         normalize_embedding=True,
         graph_feats_dim=0,
         debug=False,
+        pretraining=False
     ):
         """
         Initialize the PolyGNN model.
@@ -61,6 +62,8 @@ class polyGNN(pt.std_module.StandardModule):
             normalize_embedding,
             debug,
         )
+        if pretraining:
+            self.mpnn = ZINC_pretrain(self.mpnn, node_size, edge_size)
 
         self.final_mlp = pt.layers.Mlp(
             input_dim=self.mpnn.readout_dim + self.selector_dim + self.graph_feats_dim,
@@ -101,7 +104,8 @@ class polyGNN(pt.std_module.StandardModule):
         return data.yhat.view(data.num_graphs, 1)
 
 
-def ZINC_pretrain(model: polyGNN) -> polyGNN:
+
+def ZINC_pretrain(model: layers.MtConcat_PolyMpnn, node_size, edge_size) -> layers.MtConcat_PolyMpnn:
     zinc_dataset = ZINC(root = 'data/', split='train')
     zinc_dataset_val = ZINC(root = 'data/', split='val')   
 
@@ -116,10 +120,23 @@ def ZINC_pretrain(model: polyGNN) -> polyGNN:
         model.train()
         optimizer.zero_grad()
 
-        output = model(x=batch.x, 
-                    edge_index=batch.edge_index, 
-                    edge_attr=batch.edge_attr, 
-                    batch_index=batch.batch)
+        print("_______________________________________________________________________________________________")
+        print(batch)
+        print("_______________________________________________________________________________________________")
+        # print(batch.x.dtype, batch.edge_index.dtype, torch.tensor([batch.edge_attr.detach().numpy()]).dtype, batch.y.dtype, batch.batch.dtype, batch.ptr.dtype)
+        # print("__________________________________________________________________________________")
+        # print(batch.x.size(), batch.edge_index.size(), torch.tensor([batch.edge_attr.detach().numpy()]).size(), batch.y.size(), batch.batch.size(), batch.ptr.size())
+        # print("_______________________________________________________________________________________________")
+        # print(batch.edge_attr.dtype)
+        # print("__________________________________________________________________________________")
+        # print(batch.batch.dtype)
+        # print("__________________________________________________________________________________")
+        # print(batch.y.dtype)
+
+        output = model(x=batch.x.float(), 
+                    edge_index=batch.edge_index,
+                    edge_weight=batch.edge_attr, 
+                    batch=batch.batch)
         
         loss = loss_fn(output.squeeze(1), batch.y)
 
@@ -152,7 +169,7 @@ def ZINC_pretrain(model: polyGNN) -> polyGNN:
     global_counter = 0
 
 
-    for e in range(1, epochs+1):
+    for _ in range(1, epochs+1):
         loss_sum = 0
         loss_count = 0
 
